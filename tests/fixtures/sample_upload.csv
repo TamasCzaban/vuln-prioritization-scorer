@@ -1,0 +1,6 @@
+cve_id,asset_name,asset_exposure
+CVE-2021-44228,prod-api-gateway-01,internet-facing
+CVE-2023-23397,exchange-server-corp,internal
+CVE-2022-30190,workstation-fleet,
+CVE-2021-34527,print-spooler-srv,internet-facing
+CVE-2020-1472,domain-controller-01,critical-infra

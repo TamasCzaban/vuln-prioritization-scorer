@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vulnerability Prioritization Report</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 20px; background: #f5f5f5; color: #333; }
+  h1 { color: #1a237e; }
+  .summary { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .band-counts { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; }
+  .band-card { padding: 16px 24px; border-radius: 8px; color: white; text-align: center; min-width: 100px; }
+  .Critical { background: #d32f2f; }
+  .High { background: #f57c00; }
+  .Medium { background: #fbc02d; color: #333; }
+  .Low { background: #388e3c; }
+  .band-card .count { font-size: 2em; font-weight: bold; }
+  .band-card .label { font-size: 0.9em; opacity: 0.9; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  th { background: #1a237e; color: white; padding: 12px; text-align: left; }
+  td { padding: 10px 12px; border-bottom: 1px solid #eee; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.85em; font-weight: bold; color: white; }
+  .badge.Critical { background: #d32f2f; }
+  .badge.High { background: #f57c00; }
+  .badge.Medium { background: #fbc02d; color: #333; }
+  .badge.Low { background: #388e3c; }
+  .chart-container { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .methodology { background: white; padding: 20px; border-radius: 8px; margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 0.9em; color: #666; }
+  .top5 { margin: 16px 0; }
+  .top5 li { margin: 4px 0; }
+</style>
+</head>
+<body>
+<h1>Vulnerability Prioritization Report</h1>
+
+<div class="summary">
+  <h2>Executive Summary</h2>
+  <div class="band-counts">
+    {% for band in ["Critical", "High", "Medium", "Low"] %}
+    <div class="band-card {{ band }}">
+      <div class="count">{{ band_counts.get(band, 0) }}</div>
+      <div class="label">{{ band }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  <h3>Top 5 CVEs</h3>
+  <ol class="top5">
+    {% for cve in top5 %}
+    <li><strong>{{ cve.cve_id }}</strong> — Score: {{ "%.3f"|format(cve.composite_score) }} <span class="badge {{ cve.priority_band }}">{{ cve.priority_band }}</span></li>
+    {% endfor %}
+  </ol>
+</div>
+
+<div class="chart-container">
+  <h2>Factor Contributions (Top 20)</h2>
+  {{ chart_html }}
+</div>
+
+<h2>Full Ranked CVE List</h2>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>CVE ID</th>
+      <th>Asset</th>
+      <th>Exposure</th>
+      <th>CVSS v3</th>
+      <th>EPSS</th>
+      <th>Score</th>
+      <th>Priority</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in table_rows %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td><strong>{{ row.cve_id }}</strong></td>
+      <td>{{ row.asset_name }}</td>
+      <td>{{ row.exposure }}</td>
+      <td>{{ row.cvss }}</td>
+      <td>{{ row.epss }}</td>
+      <td><strong>{{ row.score }}</strong></td>
+      <td><span class="badge {{ row.band }}">{{ row.band }}</span></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="methodology">
+  <h3>Methodology</h3>
+  <p><strong>Formula:</strong> composite_score = w_cvss × N_cvss + w_epss × N_epss + w_exposure × N_exposure + w_age × N_age</p>
+  <p><strong>Weights used:</strong>
+    CVSS={{ "%.2f"|format(weights.get("cvss", 0.35)) }},
+    EPSS={{ "%.2f"|format(weights.get("epss", 0.30)) }},
+    Exposure={{ "%.2f"|format(weights.get("exposure", 0.20)) }},
+    Age={{ "%.2f"|format(weights.get("age", 0.15)) }}
+  </p>
+  <p><strong>Exposure tier values:</strong> {{ tier_values }}</p>
+  <p><strong>Data sources:</strong> NVD API v2 (CVSS + published date), FIRST EPSS API</p>
+  <p><strong>Normalization:</strong> CVSS/10, sqrt(EPSS), ordinal tier map, log-scale age (capped 3y)</p>
+</div>
+</body>
+</html>
