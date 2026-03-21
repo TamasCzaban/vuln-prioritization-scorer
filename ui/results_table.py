@@ -214,6 +214,11 @@ def render_chart(df: pd.DataFrame, weights: dict):
         font=dict(color="rgba(255,255,255,0.75)"),
         xaxis=dict(gridcolor="rgba(255,255,255,0.08)", zerolinecolor="rgba(255,255,255,0.15)"),
         yaxis=dict(gridcolor="rgba(0,0,0,0)"),
+        hoverlabel=dict(
+            bgcolor="#161b22",
+            bordercolor="#30363d",
+            font=dict(color="#e6edf3", size=12),
+        ),
     )
 
     st.plotly_chart(fig, use_container_width=True)

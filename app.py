@@ -22,6 +22,53 @@ st.set_page_config(
     layout="wide",
 )
 
+st.markdown("""
+<style>
+/* Hide Streamlit top toolbar */
+header[data-testid="stHeader"] { display: none !important; }
+#MainMenu, footer { visibility: hidden !important; }
+.stDeployButton { display: none !important; }
+
+/* Fix dropdown/selectbox options — dark bg, legible text */
+[data-baseweb="popover"],
+[data-baseweb="menu"] {
+    background-color: #161b22 !important;
+    border: 1px solid #30363d !important;
+}
+[role="listbox"] {
+    background-color: #161b22 !important;
+}
+[role="option"] {
+    background-color: #161b22 !important;
+    color: #e6edf3 !important;
+}
+[role="option"]:hover,
+[role="option"][aria-selected="true"],
+[data-baseweb="list-item"]:hover {
+    background-color: #1f2937 !important;
+    color: #e6edf3 !important;
+}
+[data-baseweb="popover"] *,
+[data-baseweb="menu"] *,
+[role="listbox"] * {
+    color: #e6edf3 !important;
+}
+[data-baseweb="popover"] li,
+[data-baseweb="menu"] li {
+    background-color: #161b22 !important;
+}
+[data-baseweb="popover"] li:hover,
+[data-baseweb="menu"] li:hover {
+    background-color: #1f2937 !important;
+}
+
+/* Fix Plotly chart tooltip (hoverlabel) via CSS fallback */
+.plotly .hoverlayer .hovertext {
+    fill: #e6edf3 !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 
 def main():
     st.title("Vulnerability Prioritization Scorer")
